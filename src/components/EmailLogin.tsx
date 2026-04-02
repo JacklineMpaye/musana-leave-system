@@ -14,21 +14,21 @@ const EmailLogin = ({ onLogin }: EmailLoginProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (email.trim()) {
-      onLogin(email.trim());
+      onLogin(email.trim().toLowerCase());
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <Card className="w-full max-w-md shadow-lg">
-        <CardHeader className="text-center space-y-2">
-          <div className="mx-auto w-12 h-12 rounded-xl bg-primary flex items-center justify-center mb-2">
-            <Mail className="w-6 h-6 text-primary-foreground" />
+      <Card className="w-full max-w-md shadow-lg border-0 shadow-primary/5">
+        <CardHeader className="text-center space-y-3 pb-2">
+          <div className="mx-auto w-14 h-14 rounded-2xl bg-primary flex items-center justify-center mb-1">
+            <Mail className="w-7 h-7 text-primary-foreground" />
           </div>
-          <CardTitle className="text-2xl">Welcome</CardTitle>
-          <CardDescription>Enter your email to view your leave information</CardDescription>
+          <CardTitle className="text-2xl">Welcome to Musana Leave System</CardTitle>
+          <CardDescription className="text-base">Enter your email to continue</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-2">
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
               type="email"
@@ -36,8 +36,9 @@ const EmailLogin = ({ onLogin }: EmailLoginProps) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              className="h-11"
             />
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full h-11 text-base font-medium">
               Continue
             </Button>
           </form>

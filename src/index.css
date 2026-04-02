@@ -2,48 +2,48 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 @layer base {
   :root {
-    --background: 30 20% 98%;
-    --foreground: 220 20% 14%;
+    --background: 0 0% 98%;
+    --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 20% 14%;
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 20% 14%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 24 85% 55%;
+    --primary: 217 91% 50%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 30 15% 94%;
-    --secondary-foreground: 220 20% 14%;
+    --secondary: 214 32% 96%;
+    --secondary-foreground: 222 47% 11%;
 
-    --muted: 30 10% 93%;
-    --muted-foreground: 220 10% 46%;
+    --muted: 214 20% 95%;
+    --muted-foreground: 215 16% 47%;
 
-    --accent: 24 85% 55%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 214 32% 96%;
+    --accent-foreground: 222 47% 11%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 30 12% 90%;
-    --input: 30 12% 90%;
-    --ring: 24 85% 55%;
+    --border: 214 20% 92%;
+    --input: 214 20% 92%;
+    --ring: 217 91% 50%;
 
-    --radius: 0.75rem;
+    --radius: 0.625rem;
 
     --success: 142 60% 40%;
     --success-foreground: 0 0% 100%;
-    --warning: 40 90% 50%;
-    --warning-foreground: 40 90% 15%;
-    --info: 205 80% 50%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 38 92% 15%;
+    --info: 217 91% 50%;
     --info-foreground: 0 0% 100%;
 
-    font-family: 'DM Sans', system-ui, sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
   }
 }
 
