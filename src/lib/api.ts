@@ -1,4 +1,4 @@
-const API_URL = "https://script.googleusercontent.com/a/macros/musana.org/echo?user_content_key=AWDtjMW-bMc_cnEHwHcdvEwAJIwh1kWqIpuATziuaFbTYP7mGeMvUlxEk2NAeUa1xnHf_VLgOMBX4VMKPAG56A5gzntLrR8-x_fpOt-btUhQmME4qCyOUdnvYChywxV7z9yOBe9W95cNcCut1NG17OxlI8krfjAokpV0EpE-ablHlqGijJO1afnRT8NP68aECloGMdymPZB58WqYBxR-1cdHf-EICoBtMp1VK4wVhthiBZwK2OdHN4YQKHa9WgXVggt0K243UJMjyjGtH2P0dBDa3gvaCubpOxuswFJQxevUYbxP6JhDqRbzyGzsakr1NqqgK5Ez1a1w&lib=M4EE4T2ANSJcEFgHrCPc03k0LTOfyky5F";
+const API_URL = "https://script.google.com/macros/s/AKfycbzMCVIVfT1kLLQhRDeZwOENFAPW-GGdut_HA2e-g-wXXzh2N4RNtaEL_PDGk6k5fbv4/exec";
 
 export const fetchData = async (action: string, email?: string) => {
   const url = email
