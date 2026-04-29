@@ -18,3 +18,10 @@ export const postData = async (action: string, body: Record<string, unknown>) =>
   if (!res.ok) throw new Error("Failed to submit");
   return res.json();
 };
+
+export const approveRejectHR = async (requestId: string, action: "approve" | "reject") => {
+  const url = `${API_URL}?stage=hr&req=${encodeURIComponent(requestId)}&action=${action}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("Failed to submit");
+  return res.text();
+};

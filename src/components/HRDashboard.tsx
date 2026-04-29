@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, CheckCircle, XCircle, Users, Clock, CalendarCheck, UserPlus } from "lucide-react";
-import { fetchData, postData } from "@/lib/api";
+import { fetchData, postData, approveRejectHR } from "@/lib/api";
 import { toast } from "sonner";
 import StatusBadge from "@/components/StatusBadge";
 
@@ -28,8 +28,8 @@ const HRDashboard = ({ email, highlightReqId }: Props) => {
   const allBalancesQuery = useQuery({ queryKey: ["allBalances"], queryFn: () => fetchData("allBalances") });
 
   const actionMutation = useMutation({
-    mutationFn: (params: { requestId: string; action: string }) =>
-      postData("approveReject", { ...params, email, role: "HR" }),
+    mutationFn: (params: { requestId: string; action: "approve" | "reject" }) =>
+      approveRejectHR(params.requestId, params.action),
     onSuccess: () => {
       toast.success("Action completed successfully");
       queryClient.invalidateQueries({ queryKey: ["hrPending"] });
