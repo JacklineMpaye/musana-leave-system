@@ -15,6 +15,7 @@ interface Props {
 
 const EmployeeDashboard = ({ email, highlightReqId }: Props) => {
   const [modalOpen, setModalOpen] = useState(false);
+  const [formLoading, setFormLoading] = useState(true);
 
   const balancesQuery = useQuery({
     queryKey: ["balances", email],
@@ -27,6 +28,7 @@ const EmployeeDashboard = ({ email, highlightReqId }: Props) => {
   });
 
   const isLoading = balancesQuery.isLoading || requestsQuery.isLoading;
+  const isError = balancesQuery.isError || requestsQuery.isError;
 
   const refetchAll = () => {
     balancesQuery.refetch();
@@ -36,12 +38,31 @@ const EmployeeDashboard = ({ email, highlightReqId }: Props) => {
   const balances = balancesQuery.data?.balances || balancesQuery.data?.Balances || balancesQuery.data || [];
   const requests = requestsQuery.data?.requests || requestsQuery.data?.Requests || requestsQuery.data || [];
   const balanceList = Array.isArray(balances) ? balances : [];
-  const requestList = Array.isArray(requests) ? requests : [];
+  const requestList = Array.isArray(requests)
+    ? [...requests].sort((a, b) => {
+        const dateA = new Date(a["Start Date"] || a["Start_Date"] || a.start_date || 0);
+        const dateB = new Date(b["Start Date"] || b["Start_Date"] || b.start_date || 0);
+        return dateB.getTime() - dateA.getTime();
+      })
+    : [];
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-20">
+      <div className="flex flex-col items-center justify-center py-20 gap-3">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <p className="text-sm text-muted-foreground">Loading your data...</p>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 gap-3">
+        <p className="text-sm text-destructive font-medium">Failed to load data. The server may be slow or unavailable.</p>
+        <Button variant="outline" size="sm" onClick={refetchAll}>
+          <RefreshCw className="w-4 h-4 mr-2" />
+          Retry
+        </Button>
       </div>
     );
   }
@@ -89,8 +110,8 @@ const EmployeeDashboard = ({ email, highlightReqId }: Props) => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {balanceList.map((b: any, i: number) => {
-              const type = b["Leave Type"] || b.leaveType || b.type || "Leave";
-              const entitlement = b.Entitlement ?? b.entitlement ?? b.total ?? 0;
+              const type = b["Leave Type"] || b.leave_type || b.leaveType || b.type || "Leave";
+              const entitlement = b.Entitlement ?? b.entitlement ?? b.Total ?? b.total ?? 0;
               const used = b.Used ?? b.used ?? 0;
               const remaining = b.Remaining ?? b.remaining ?? (entitlement - used);
               return (
@@ -126,22 +147,29 @@ const EmployeeDashboard = ({ email, highlightReqId }: Props) => {
                   <TableHead>Leave Type</TableHead>
                   <TableHead>Start Date</TableHead>
                   <TableHead>End Date</TableHead>
+                  <TableHead>Days</TableHead>
                   <TableHead>Status</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {requestList.map((r: any, i: number) => {
-                  const reqId = r.requestId || r.id || "";
+                  const reqId = r["Request_ID"] || r.requestId || r.id || "";
                   const isHighlighted = highlightReqId && String(reqId) === String(highlightReqId);
+                  const fmtDate = (val: any) => {
+                    if (!val) return "-";
+                    const d = new Date(val);
+                    return isNaN(d.getTime()) ? String(val) : d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+                  };
                   return (
                     <TableRow
                       key={i}
                       id={isHighlighted ? "highlighted-request" : undefined}
                       className={isHighlighted ? "bg-primary/10 ring-2 ring-primary/30" : ""}
                     >
-                      <TableCell className="font-medium">{r["Leave Type"] || r.leaveType || r.type || "-"}</TableCell>
-                      <TableCell>{r["Start Date"] || r.startDate || r.start || "-"}</TableCell>
-                      <TableCell>{r["End Date"] || r.endDate || r.end || "-"}</TableCell>
+                      <TableCell className="font-medium">{r["Leave Type"] || r["Leave_Type"] || r.leave_type || r.leaveType || "-"}</TableCell>
+                      <TableCell>{fmtDate(r["Start Date"] || r["Start_Date"] || r.start_date || r.startDate)}</TableCell>
+                      <TableCell>{fmtDate(r["End Date"] || r["End_Date"] || r.end_date || r.endDate)}</TableCell>
+                      <TableCell>{r["Days_Requested"] || r.Days_Requested || r.Days || r.days || "-"}</TableCell>
                       <TableCell><StatusBadge status={r.Status || r.status || ""} /></TableCell>
                     </TableRow>
                   );
@@ -153,21 +181,34 @@ const EmployeeDashboard = ({ email, highlightReqId }: Props) => {
       </section>
 
       {/* Request Leave Modal */}
-      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+      <Dialog
+        open={modalOpen}
+        onOpenChange={(open) => {
+          setModalOpen(open);
+          if (open) setFormLoading(true);
+        }}
+      >
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Request Leave</DialogTitle>
           </DialogHeader>
+          {formLoading && (
+            <div className="flex flex-col items-center justify-center py-10 gap-3">
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+              <p className="text-sm text-muted-foreground">Loading form...</p>
+            </div>
+          )}
           <iframe
             src="https://docs.google.com/forms/d/e/1FAIpQLSeQzQ3LqqZiuJUCyoO_Pk1aahEq_RImtCdpM4G06hGO0mPXww/viewform?embedded=true"
             width="100%"
             height="700"
-            style={{ border: "none" }}
+            style={{ border: "none", display: formLoading ? "none" : "block" }}
             title="Leave Request Form"
+            onLoad={() => setFormLoading(false)}
           />
           <Button onClick={() => { setModalOpen(false); refetchAll(); }} className="w-full">
             <RefreshCw className="w-4 h-4 mr-2" />
-            Close & Refresh
+            Done — Close & Refresh
           </Button>
         </DialogContent>
       </Dialog>

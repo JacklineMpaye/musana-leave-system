@@ -4,9 +4,19 @@ export const fetchData = async (action: string, email?: string) => {
   const url = email
     ? `${API_URL}?action=${action}&email=${encodeURIComponent(email)}`
     : `${API_URL}?action=${action}`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error("Failed to fetch");
-  return res.json();
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30000);
+  try {
+    const res = await fetch(url, {
+      signal:   controller.signal,
+      redirect: "follow",
+      mode:     "cors",
+    });
+    if (!res.ok) throw new Error("Failed to fetch");
+    return res.json();
+  } finally {
+    clearTimeout(timeout);
+  }
 };
 
 export const postData = async (action: string, body: Record<string, unknown>) => {
@@ -19,9 +29,24 @@ export const postData = async (action: string, body: Record<string, unknown>) =>
   return res.json();
 };
 
-export const approveRejectHR = async (requestId: string, action: "approve" | "reject") => {
-  const url = `${API_URL}?stage=hr&req=${encodeURIComponent(requestId)}&action=${action}`;
-  const res = await fetch(url);
+// Returns JSON — uses the new deptApproval endpoint (not the HTML-based email link handler)
+export const approveRejectDept = async (requestId: string, action: "approve" | "reject", reason?: string) => {
+  let url = `${API_URL}?action=deptApproval&req=${encodeURIComponent(requestId)}&decision=${action}`;
+  if (reason) url += `&reason=${encodeURIComponent(reason)}`;
+  const res = await fetch(url, { redirect: "follow", mode: "cors" });
   if (!res.ok) throw new Error("Failed to submit");
-  return res.text();
+  const data = await res.json();
+  if (!data.success) throw new Error(data.error || "Action failed");
+  return data;
+};
+
+// Returns JSON — uses the new hrApproval endpoint (not the HTML-based email link handler)
+export const approveRejectHR = async (requestId: string, action: "approve" | "reject", reason?: string) => {
+  let url = `${API_URL}?action=hrApproval&req=${encodeURIComponent(requestId)}&decision=${action}`;
+  if (reason) url += `&reason=${encodeURIComponent(reason)}`;
+  const res = await fetch(url, { redirect: "follow", mode: "cors" });
+  if (!res.ok) throw new Error("Failed to submit");
+  const data = await res.json();
+  if (!data.success) throw new Error(data.error || "Action failed");
+  return data;
 };
