@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, CheckCircle, XCircle, RefreshCw, Clock, CalendarDays, User, UserPlus, ChevronDown, ChevronUp, History } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { fetchData, approveRejectDept, addEmployee } from "@/lib/api";
@@ -31,7 +32,10 @@ const emptyEmployee = (deptHeadEmail: string) => ({
   fullName: "",
   email: "",
   department: "",
+  role: "Employee",
   jobTitle: "",
+  dutyStation: "",
+  startDate: "",
   deptHeadEmail,
 });
 
@@ -475,50 +479,54 @@ const DeptHeadDashboard = ({ email, highlightReqId }: Props) => {
               addEmployeeMutation.mutate(newEmployee);
             }}
           >
-            <div className="space-y-2">
-              <Label>Full Name <span className="text-destructive">*</span></Label>
-              <Input
-                placeholder="e.g. Jane Doe"
-                value={newEmployee.fullName}
-                onChange={field("fullName")}
-                required
-              />
-            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="col-span-2 space-y-2">
+                <Label>Full Name <span className="text-destructive">*</span></Label>
+                <Input placeholder="e.g. Jane Doe" value={newEmployee.fullName} onChange={field("fullName")} required />
+              </div>
 
-            <div className="space-y-2">
-              <Label>Email <span className="text-destructive">*</span></Label>
-              <Input
-                type="email"
-                placeholder="e.g. jane@musana.org"
-                value={newEmployee.email}
-                onChange={field("email")}
-                required
-              />
-            </div>
+              <div className="col-span-2 space-y-2">
+                <Label>Email <span className="text-destructive">*</span></Label>
+                <Input type="email" placeholder="e.g. jane@musana.org" value={newEmployee.email} onChange={field("email")} required />
+              </div>
 
-            <div className="space-y-2">
-              <Label>Department <span className="text-destructive">*</span></Label>
-              <Input
-                placeholder="e.g. Finance"
-                value={newEmployee.department}
-                onChange={field("department")}
-                required
-              />
-            </div>
+              <div className="space-y-2">
+                <Label>Department <span className="text-destructive">*</span></Label>
+                <Input placeholder="e.g. Finance" value={newEmployee.department} onChange={field("department")} required />
+              </div>
 
-            <div className="space-y-2">
-              <Label>Job Title</Label>
-              <Input
-                placeholder="e.g. Accountant"
-                value={newEmployee.jobTitle}
-                onChange={field("jobTitle")}
-              />
-            </div>
+              <div className="space-y-2">
+                <Label>Role</Label>
+                <Select value={newEmployee.role} onValueChange={(v) => setNewEmployee(prev => ({ ...prev, role: v }))}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Employee">Employee</SelectItem>
+                    <SelectItem value="Dept Head">Dept Head</SelectItem>
+                    <SelectItem value="HR">HR</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <div className="space-y-2">
-              <Label>Your Email (Dept Head)</Label>
-              <Input value={newEmployee.deptHeadEmail} disabled className="bg-muted text-muted-foreground" />
-              <p className="text-xs text-muted-foreground">Auto-filled — this links the employee to your department.</p>
+              <div className="space-y-2">
+                <Label>Job Title</Label>
+                <Input placeholder="e.g. Accountant" value={newEmployee.jobTitle} onChange={field("jobTitle")} />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Duty Station</Label>
+                <Input placeholder="e.g. Kampala" value={newEmployee.dutyStation} onChange={field("dutyStation")} />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Start Date</Label>
+                <Input type="date" value={newEmployee.startDate} onChange={field("startDate")} />
+              </div>
+
+              <div className="col-span-2 space-y-2">
+                <Label>Your Email (Dept Head)</Label>
+                <Input value={newEmployee.deptHeadEmail} disabled className="bg-muted text-muted-foreground" />
+                <p className="text-xs text-muted-foreground">Auto-filled — links this employee to your department.</p>
+              </div>
             </div>
 
             <DialogFooter>

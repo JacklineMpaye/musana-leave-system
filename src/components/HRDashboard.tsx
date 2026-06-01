@@ -23,7 +23,7 @@ const HRDashboard = ({ highlightReqId }: Props) => {
   const [confirmAction, setConfirmAction] = useState<{ reqId: string; action: "approve" | "reject"; reason?: string } | null>(null);
   const [rejectReason, setRejectReason] = useState("");
   const [addEmployeeOpen, setAddEmployeeOpen] = useState(false);
-  const [newEmployee, setNewEmployee] = useState({ fullName: "", email: "", department: "", role: "Employee", deptHeadEmail: "" });
+  const [newEmployee, setNewEmployee] = useState({ fullName: "", email: "", department: "", role: "Employee", jobTitle: "", dutyStation: "", startDate: "", deptHeadEmail: "" });
 
   const pendingQuery = useQuery({ queryKey: ["hrPending"], queryFn: () => fetchData("hrPending") });
   const overviewQuery = useQuery({ queryKey: ["hrOverview"], queryFn: () => fetchData("hrOverview") });
@@ -48,7 +48,7 @@ const HRDashboard = ({ highlightReqId }: Props) => {
       queryClient.invalidateQueries({ queryKey: ["allBalances"] });
       queryClient.invalidateQueries({ queryKey: ["hrOverview"] });
       setAddEmployeeOpen(false);
-      setNewEmployee({ fullName: "", email: "", department: "", role: "Employee", deptHeadEmail: "" });
+      setNewEmployee({ fullName: "", email: "", department: "", role: "Employee", jobTitle: "", dutyStation: "", startDate: "", deptHeadEmail: "" });
     },
     onError: () => toast.error("Failed to add employee."),
   });
@@ -281,32 +281,46 @@ const HRDashboard = ({ highlightReqId }: Props) => {
               addEmployeeMutation.mutate(newEmployee);
             }}
           >
-            <div className="space-y-2">
-              <Label>Full Name *</Label>
-              <Input value={newEmployee.fullName} onChange={(e) => setNewEmployee({ ...newEmployee, fullName: e.target.value })} required />
-            </div>
-            <div className="space-y-2">
-              <Label>Email *</Label>
-              <Input type="email" value={newEmployee.email} onChange={(e) => setNewEmployee({ ...newEmployee, email: e.target.value })} required />
-            </div>
-            <div className="space-y-2">
-              <Label>Department *</Label>
-              <Input value={newEmployee.department} onChange={(e) => setNewEmployee({ ...newEmployee, department: e.target.value })} required />
-            </div>
-            <div className="space-y-2">
-              <Label>Role</Label>
-              <Select value={newEmployee.role} onValueChange={(v) => setNewEmployee({ ...newEmployee, role: v })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Employee">Employee</SelectItem>
-                  <SelectItem value="Dept Head">Dept Head</SelectItem>
-                  <SelectItem value="HR">HR</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>Dept Head Email</Label>
-              <Input type="email" value={newEmployee.deptHeadEmail} onChange={(e) => setNewEmployee({ ...newEmployee, deptHeadEmail: e.target.value })} />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="col-span-2 space-y-2">
+                <Label>Full Name *</Label>
+                <Input value={newEmployee.fullName} onChange={(e) => setNewEmployee({ ...newEmployee, fullName: e.target.value })} required />
+              </div>
+              <div className="col-span-2 space-y-2">
+                <Label>Email *</Label>
+                <Input type="email" value={newEmployee.email} onChange={(e) => setNewEmployee({ ...newEmployee, email: e.target.value })} required />
+              </div>
+              <div className="space-y-2">
+                <Label>Department *</Label>
+                <Input value={newEmployee.department} onChange={(e) => setNewEmployee({ ...newEmployee, department: e.target.value })} required />
+              </div>
+              <div className="space-y-2">
+                <Label>Role</Label>
+                <Select value={newEmployee.role} onValueChange={(v) => setNewEmployee({ ...newEmployee, role: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Employee">Employee</SelectItem>
+                    <SelectItem value="Dept Head">Dept Head</SelectItem>
+                    <SelectItem value="HR">HR</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Job Title</Label>
+                <Input placeholder="e.g. Accountant" value={newEmployee.jobTitle} onChange={(e) => setNewEmployee({ ...newEmployee, jobTitle: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label>Duty Station</Label>
+                <Input placeholder="e.g. Kampala" value={newEmployee.dutyStation} onChange={(e) => setNewEmployee({ ...newEmployee, dutyStation: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label>Start Date</Label>
+                <Input type="date" value={newEmployee.startDate} onChange={(e) => setNewEmployee({ ...newEmployee, startDate: e.target.value })} />
+              </div>
+              <div className="col-span-2 space-y-2">
+                <Label>Dept Head Email</Label>
+                <Input type="email" placeholder="e.g. head@musana.org" value={newEmployee.deptHeadEmail} onChange={(e) => setNewEmployee({ ...newEmployee, deptHeadEmail: e.target.value })} />
+              </div>
             </div>
             <DialogFooter>
               <Button type="submit" disabled={addEmployeeMutation.isPending} className="w-full">
