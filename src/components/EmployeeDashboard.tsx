@@ -13,9 +13,12 @@ interface Props {
   highlightReqId?: string | null;
 }
 
+const INITIAL_REQUESTS = 3;
+
 const EmployeeDashboard = ({ email, highlightReqId }: Props) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [formLoading, setFormLoading] = useState(true);
+  const [showAllRequests, setShowAllRequests] = useState(false);
 
   const balancesQuery = useQuery({
     queryKey: ["balances", email],
@@ -140,43 +143,56 @@ const EmployeeDashboard = ({ email, highlightReqId }: Props) => {
         {requestList.length === 0 ? (
           <Card className="shadow-sm"><CardContent className="p-8 text-center text-muted-foreground">No leave requests found.</CardContent></Card>
         ) : (
-          <Card className="shadow-sm overflow-hidden border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Leave Type</TableHead>
-                  <TableHead>Start Date</TableHead>
-                  <TableHead>End Date</TableHead>
-                  <TableHead>Days</TableHead>
-                  <TableHead>Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {requestList.map((r: any, i: number) => {
-                  const reqId = r["Request_ID"] || r.requestId || r.id || "";
-                  const isHighlighted = highlightReqId && String(reqId) === String(highlightReqId);
-                  const fmtDate = (val: any) => {
-                    if (!val) return "-";
-                    const d = new Date(val);
-                    return isNaN(d.getTime()) ? String(val) : d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
-                  };
-                  return (
-                    <TableRow
-                      key={i}
-                      id={isHighlighted ? "highlighted-request" : undefined}
-                      className={isHighlighted ? "bg-primary/10 ring-2 ring-primary/30" : ""}
-                    >
-                      <TableCell className="font-medium">{r["Leave Type"] || r["Leave_Type"] || r.leave_type || r.leaveType || "-"}</TableCell>
-                      <TableCell>{fmtDate(r["Start Date"] || r["Start_Date"] || r.start_date || r.startDate)}</TableCell>
-                      <TableCell>{fmtDate(r["End Date"] || r["End_Date"] || r.end_date || r.endDate)}</TableCell>
-                      <TableCell>{r["Days_Requested"] || r.Days_Requested || r.Days || r.days || "-"}</TableCell>
-                      <TableCell><StatusBadge status={r.Status || r.status || ""} /></TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </Card>
+          <>
+            <Card className="shadow-sm overflow-hidden border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Leave Type</TableHead>
+                    <TableHead>Start Date</TableHead>
+                    <TableHead>End Date</TableHead>
+                    <TableHead>Days</TableHead>
+                    <TableHead>Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {(showAllRequests ? requestList : requestList.slice(0, INITIAL_REQUESTS)).map((r: any, i: number) => {
+                    const reqId = r["Request_ID"] || r.requestId || r.id || "";
+                    const isHighlighted = highlightReqId && String(reqId) === String(highlightReqId);
+                    const fmtDate = (val: any) => {
+                      if (!val) return "-";
+                      const d = new Date(val);
+                      return isNaN(d.getTime()) ? String(val) : d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+                    };
+                    return (
+                      <TableRow
+                        key={i}
+                        id={isHighlighted ? "highlighted-request" : undefined}
+                        className={isHighlighted ? "bg-primary/10 ring-2 ring-primary/30" : ""}
+                      >
+                        <TableCell className="font-medium">{r["Leave Type"] || r["Leave_Type"] || r.leave_type || r.leaveType || "-"}</TableCell>
+                        <TableCell>{fmtDate(r["Start Date"] || r["Start_Date"] || r.start_date || r.startDate)}</TableCell>
+                        <TableCell>{fmtDate(r["End Date"] || r["End_Date"] || r.end_date || r.endDate)}</TableCell>
+                        <TableCell>{r["Days_Requested"] || r.Days_Requested || r.Days || r.days || "-"}</TableCell>
+                        <TableCell><StatusBadge status={r.Status || r.status || ""} /></TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </Card>
+            {requestList.length > INITIAL_REQUESTS && (
+              <Button
+                variant="outline"
+                className="w-full mt-2"
+                onClick={() => setShowAllRequests(prev => !prev)}
+              >
+                {showAllRequests
+                  ? "Show less"
+                  : `Show ${requestList.length - INITIAL_REQUESTS} more request${requestList.length - INITIAL_REQUESTS === 1 ? "" : "s"}`}
+              </Button>
+            )}
+          </>
         )}
       </section>
 
