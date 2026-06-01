@@ -19,14 +19,18 @@ export const fetchData = async (action: string, email?: string) => {
   }
 };
 
-export const postData = async (action: string, body: Record<string, unknown>) => {
-  const res = await fetch(`${API_URL}?action=${action}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+// Uses GET instead of POST to avoid Google Apps Script CORS preflight failures
+export const addEmployee = async (data: Record<string, string>) => {
+  const params = new URLSearchParams({ action: "addEmployee" });
+  Object.entries(data).forEach(([k, v]) => { if (v) params.set(k, v); });
+  const res = await fetch(`${API_URL}?${params.toString()}`, {
+    redirect: "follow",
+    mode:     "cors",
   });
-  if (!res.ok) throw new Error("Failed to submit");
-  return res.json();
+  if (!res.ok) throw new Error("Failed to fetch");
+  const result = await res.json();
+  if (!result.success) throw new Error(result.error || "Failed to add employee");
+  return result;
 };
 
 // Returns JSON — uses the new deptApproval endpoint (not the HTML-based email link handler)

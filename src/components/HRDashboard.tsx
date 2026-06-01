@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, CheckCircle, XCircle, Users, Clock, CalendarCheck, UserPlus } from "lucide-react";
-import { fetchData, postData, approveRejectHR } from "@/lib/api";
+import { fetchData, addEmployee, approveRejectHR } from "@/lib/api";
 import { toast } from "sonner";
 import StatusBadge from "@/components/StatusBadge";
 
@@ -42,7 +42,7 @@ const HRDashboard = ({ highlightReqId }: Props) => {
   });
 
   const addEmployeeMutation = useMutation({
-    mutationFn: (data: typeof newEmployee) => postData("addEmployee", data),
+    mutationFn: (data: typeof newEmployee) => addEmployee(data as Record<string, string>),
     onSuccess: () => {
       toast.success("Employee added/updated successfully");
       queryClient.invalidateQueries({ queryKey: ["allBalances"] });

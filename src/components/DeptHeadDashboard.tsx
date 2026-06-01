@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, CheckCircle, XCircle, RefreshCw, Clock, CalendarDays, User, UserPlus, ChevronDown, ChevronUp, History } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { fetchData, approveRejectDept, postData } from "@/lib/api";
+import { fetchData, approveRejectDept, addEmployee } from "@/lib/api";
 import { toast } from "sonner";
 import StatusBadge from "@/components/StatusBadge";
 import EmployeeDashboard from "@/components/EmployeeDashboard";
@@ -86,7 +86,7 @@ const DeptHeadDashboard = ({ email, highlightReqId }: Props) => {
   });
 
   const addEmployeeMutation = useMutation({
-    mutationFn: (data: typeof newEmployee) => postData("addEmployee", data),
+    mutationFn: (data: typeof newEmployee) => addEmployee(data as Record<string, string>),
     onSuccess: () => {
       toast.success("Employee added successfully.");
       setAddOpen(false);
